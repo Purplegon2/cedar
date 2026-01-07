@@ -31,6 +31,7 @@ import { clip } from "./clip.js";
 import { paste } from "./paste.js";
 import { cmd } from "./cmd.js";
 import { asm } from "./asm.js";
+import { get } from "./get.js";
 
 // Command registry is intentionally simple for now.
 // Add new files here and register them below.
@@ -41,7 +42,7 @@ export function buildRegistry() {
     cd, cudi, tree, read, mk, write, mkdir, rmdir, rm, where,
     mark, marks, unmark, jump, back, stat, find, seek, touch,
     cop, mv, cat, about, reboot, reset,
-    clip, paste, asm, cmd
+    clip, paste, asm, get, cmd
   ]) reg.set(entry.name, entry);
 
   return reg;
