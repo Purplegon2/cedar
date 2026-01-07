@@ -1,4 +1,4 @@
-// Simple simulated filesystem for Cedar
+// Simple filesystem for Cedar
 // Stored in sessionStorage under key `cedar:fs` so reset can wipe it.
 const FS_KEY = "cedar:fs";
 const BK_KEY = "cedar:bookmarks";
@@ -11,15 +11,20 @@ function load() {
     if (raw) return JSON.parse(raw);
   } catch (e) {}
   // default root
-  const root = {
-    type: "dir",
-    children: {
-      home: { type: "dir", children: { guest: { type: "dir", children: {} }, }, ctime: now(), mtime: now() },
-      apps: { type: "dir", children: {}, ctime: now(), mtime: now() }
-    },
-    ctime: now(),
-    mtime: now()
-  };
+  // Allow opting out of creating default directories by setting either
+  // `sessionStorage['cedar:skipDefaultDirs'] = '1'` or `window.CEDAR_SKIP_DEFAULT_FS = true`
+  const skipDefaults = (typeof window !== 'undefined' && window.CEDAR_SKIP_DEFAULT_FS) || sessionStorage.getItem('cedar:skipDefaultDirs') === '1';
+  const root = skipDefaults
+    ? { type: "dir", children: {}, ctime: now(), mtime: now() }
+    : {
+        type: "dir",
+        children: {
+          home: { type: "dir", children: { guest: { type: "dir", children: {} }, }, ctime: now(), mtime: now() },
+          apps: { type: "dir", children: {}, ctime: now(), mtime: now() }
+        },
+        ctime: now(),
+        mtime: now()
+      };
   save(root);
   return root;
 }

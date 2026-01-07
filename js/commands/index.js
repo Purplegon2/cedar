@@ -29,18 +29,20 @@ import { reboot } from "./reboot.js";
 import { reset } from "./reset.js";
 import { clip } from "./clip.js";
 import { paste } from "./paste.js";
+import { cmd } from "./cmd.js";
+import { asm } from "./asm.js";
 
 // Command registry is intentionally simple for now.
 // Add new files here and register them below.
 export function buildRegistry() {
   const reg = new Map();
-  for (const cmd of [
+  for (const entry of [
     echo, help, clear,
     cd, cudi, tree, read, mk, write, mkdir, rmdir, rm, where,
     mark, marks, unmark, jump, back, stat, find, seek, touch,
-    cop, mv, cat, about, reboot, reset
-    , clip, paste
-  ]) reg.set(cmd.name, cmd);
+    cop, mv, cat, about, reboot, reset,
+    clip, paste, asm, cmd
+  ]) reg.set(entry.name, entry);
 
   return reg;
 }

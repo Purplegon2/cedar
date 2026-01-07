@@ -4,6 +4,8 @@ export const about = {
   name: "about",
   help: "about  - print version/build/kernel info and environment notes",
   run: ({ term }) => {
+    term.printLine(`Cedar Operating System`);
+    
     term.printLine(`Cedar ${CEDAR_VERSION} (${CEDAR_BUILD})`);
     term.printLine(`kernel: ${CEDAR_KERNEL}`);
     term.printLine(`user: ${term.user}@${term.host}`);

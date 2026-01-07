@@ -25,8 +25,8 @@ function randInt(rng, lo, hi) {
   return Math.floor(rng() * (hi - lo + 1)) + lo;
 }
 
-/* ---------- simulated boot clock ---------- */
-// Keeps “wall time” stable-ish but advances with the simulated boot (not real time).
+/* ---------- boot clock ---------- */
+// Keeps “wall time” stable-ish but advances with the boot sequence (not real time).
 class BootClock {
   constructor(rng, { baseDate = new Date(), style = "wall" } = {}) {
     this.rng = rng;
@@ -38,7 +38,7 @@ class BootClock {
     this.wallMs = this.baseMs - randInt(rng, 0, 2500);
   }
 
-  // Advance simulated time by dtMs (this is NOT the sleep time necessarily)
+  // Advance boot clock time by dtMs (this is NOT the sleep time necessarily)
   tick(dtMs) {
     const dt = Math.max(0, dtMs | 0);
     this.uptimeMs += dt;
@@ -89,7 +89,7 @@ function makeProfile(opts = {}) {
 function step(msg, cfg = {}) {
   return {
     msg,
-    // how much simulated time passes in logs
+    // how much time passes in logs
     dtMs: cfg.dtMs ?? 30,
     // how long we visually wait before printing next line
     waitMs: cfg.waitMs ?? 30,
@@ -133,7 +133,7 @@ async function runBoot(term, steps, profile) {
       clock.tick(spend);
     }
 
-    // Apply wait and advance simulated time accordingly
+    // Apply wait and advance clock time accordingly
     if (wait > 0) {
       await sleep(wait);
       clock.tick(wait);
@@ -273,14 +273,50 @@ export async function bootSequence(term, opts = {}) {
   const steps = buildSteps(profile, { isReboot });
   await runBoot(term, steps, profile);
 
+  // Ensure boot is responsible for initial filesystem setup.
+  // seedDefaultFS will respect the user's opt-out flag.
+  try { await seedDefaultFS(term); } catch (e) { /* seeding errors already reported */ }
+
   term.printLine("");
   term.printLine(`Cedar ${CEDAR_VERSION} (${CEDAR_BUILD})`);
-  term.printLine("");
-  term.printLine(`..:^~~!!~~^:..                  `);
   term.printLine("");
   term.printLine("Type `help` to list commands.");
   term.printLine("Ctrl+L: clear | Ctrl+Alt+R: reboot");
   term.printLine("");
 
   term.setBootMode(false);
+}
+
+// Run a shell command against the provided Terminal during boot.
+// Uses the terminal's internal command runner. Returns a Promise.
+export async function sendOSCommand(term, cmdline) {
+  if (!term || typeof term._runCommand !== "function") throw new Error("terminal not available");
+  term.printLine(`[init] running: ${cmdline}`);
+  try {
+    await term._runCommand(cmdline);
+  } catch (e) {
+    term.printLine(`[init] command error: ${e && e.message ? e.message : String(e)}`);
+  }
+}
+
+// Seed a minimal filesystem and marks the first time Cedar boots in this session.
+export async function seedDefaultFS(term) {
+  try {
+    const seededKey = "cedar:seeded";
+    // Respect explicit skip flag to avoid creating defaults.
+    const skipDefaults = (typeof window !== 'undefined' && window.CEDAR_SKIP_DEFAULT_FS) || sessionStorage.getItem('cedar:skipDefaultDirs') === '1';
+    if (skipDefaults) return;
+    if (sessionStorage.getItem(seededKey)) return;
+    // create common dirs and a welcome file; these commands use the shell
+    const cmds = [
+      "echo shank"
+    ];
+    for (const c of cmds) {
+      await sendOSCommand(term, c);
+    }
+    sessionStorage.setItem(seededKey, '1');
+    term.printLine('[init] default filesystem seeded');
+  } catch (e) {
+    term.printLine(`[init] seeding error: ${e && e.message ? e.message : String(e)}`);
+  }
 }
