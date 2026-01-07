@@ -1,0 +1,46 @@
+:root {
+  color-scheme: dark;
+  --bg: #000;
+  --fg: #e6e6e6;
+  --dim: #9aa0a6;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+}
+
+#frame {
+  height: 100%;
+  width: 100%;
+  display: block;
+  background: var(--bg);
+  overflow: hidden; /* keep it terminal-like */
+  position: relative;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#screen {
+  margin: 0;
+  padding: 12px;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 16px;
+  line-height: 1.2;
+  color: var(--fg);
+  white-space: pre; /* strict terminal grid */
+  user-select: none; /* feels more like a terminal */
+}
+
+#kbd {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  height: 1px;
+  width: 1px;
+  left: 0;
+  top: 0;
+}

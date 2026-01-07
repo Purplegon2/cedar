@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Cedar</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- The visible UI is only the terminal "screen". -->
+  <main id="frame" aria-label="Cedar terminal">
+    <pre id="screen" aria-live="polite"></pre>
+    <!-- Hidden input ensures iPadOS on-screen keyboard works reliably -->
+    <input id="kbd" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text" />
+  </main>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

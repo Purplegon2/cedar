@@ -1,0 +1,20 @@
+cedar-os/
+  index.html
+  css/
+    style.css
+  js/
+    main.js
+    engine/
+      screen.js       (ASCII screen buffer + renderer)
+      terminal.js     (prompt/input/history + command dispatch)
+    commands/
+      index.js        (registry builder; add commands here)
+      echo.js
+      help.js
+      clear.js
+    os/
+      boot.js         (boot/reboot log sequence)
+      version.js      (version/build strings)
+  docs/
+    structure.txt
+  README.md
